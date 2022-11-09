@@ -22,10 +22,12 @@ public class Util {
     private static SessionFactory sessionFactory;
 
     private static class ConnectionHolder {
-        public static Util UTIL_CONNECTION = new Util(MY_URL, MY_USER, MY_PASS);
+        public static Util UTIL_CONNECTION =
+                new Util(MY_URL, MY_USER, MY_PASS);
     }
     private static class SessionFactoryHolder {
-        public static Util UTIL_SESSION_FACTORY = new Util(MY_DRIVER, MY_URL, MY_USER, MY_PASS, MY_DIALECT, MY_SHOW_SQL, MY_CURRENT_SESSION_CONTEXT_CLASS);
+        public static Util UTIL_SESSION_FACTORY =
+                new Util(MY_DRIVER, MY_URL, MY_USER, MY_PASS, MY_DIALECT, MY_SHOW_SQL, MY_CURRENT_SESSION_CONTEXT_CLASS);
     }
 
     private Util(String MY_URL, String MY_USER, String MY_PASS) {
