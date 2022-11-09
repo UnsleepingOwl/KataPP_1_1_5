@@ -12,6 +12,9 @@ public class UserDaoJDBCImpl implements UserDao {
     private static Util util = Util.getConnectionUtil();
     Connection connection = util.getConnection();
 
+    public UserDaoJDBCImpl() {
+    }
+
     // Удаление таблицы User(ов) – не должно приводить к исключению, если таблицы не существует
     public void createUsersTable() {
         try (Statement statement = connection.createStatement()) {
@@ -87,18 +90,18 @@ public class UserDaoJDBCImpl implements UserDao {
         List<User> userList = new LinkedList<>();
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery("SELECT * FROM users")) {
-                while (resultSet.next()) {
-                    User user = new User();
-                    user.setId(resultSet.getLong("id"));
-                    user.setName(resultSet.getString("name"));
-                    user.setLastName(resultSet.getString("lastName"));
-                    user.setAge(resultSet.getByte("age"));
-                    userList.add(user);
-                }
-            connection.commit();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            while (resultSet.next()) {
+                User user = new User();
+                user.setId(resultSet.getLong("id"));
+                user.setName(resultSet.getString("name"));
+                user.setLastName(resultSet.getString("lastName"));
+                user.setAge(resultSet.getByte("age"));
+                userList.add(user);
             }
+            connection.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return userList;
     }
 
