@@ -10,7 +10,7 @@ import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
 
-    private Util util = Util.getSessionFactorUtil();
+    private Util util = Util.getSessionFactoryUtil();
     private SessionFactory sessionFactory = util.getSessionFactory();
     private Session session;
     private Transaction transaction;
@@ -23,14 +23,12 @@ public class UserDaoHibernateImpl implements UserDao {
         try {
             session = sessionFactory.getCurrentSession();
             transaction = session.beginTransaction();
-            session.createSQLQuery(
-                    "CREATE TABLE IF NOT EXISTS User (" +
-                            "id BIGINT NOT NULL AUTO_INCREMENT," +
-                            "name VARCHAR(64)," +
-                            "lastName VARCHAR(64)," +
-                            "age SMALLINT," +
-                            "PRIMARY KEY ( id ) )"
-                    )
+            session.createSQLQuery("CREATE TABLE IF NOT EXISTS User"
+                            + "(id BIGINT NOT NULL AUTO_INCREMENT,"
+                            + "name VARCHAR(64),"
+                            + "lastName VARCHAR(64),"
+                            + "age SMALLINT,"
+                            + "PRIMARY KEY ( id ) )")
                     .executeUpdate();
             transaction.commit();
         } catch (Exception e) {
@@ -90,7 +88,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public List<User> getAllUsers() {
-        List<User> listUsers = null;
+        List listUsers = null;
         try {
             session = sessionFactory.getCurrentSession();
             transaction = session.beginTransaction();
@@ -101,7 +99,7 @@ public class UserDaoHibernateImpl implements UserDao {
         } finally {
             session.close();
         }
-        return listUsers;
+        return (List<User>) listUsers;
     }
 
     @Override
@@ -109,7 +107,8 @@ public class UserDaoHibernateImpl implements UserDao {
         try {
             session = sessionFactory.getCurrentSession();
             transaction = session.beginTransaction();
-            session.createQuery("DELETE FROM User").executeUpdate();
+            session.createQuery("DELETE FROM User")
+                    .executeUpdate();
             transaction.commit();
         } catch (Exception e) {
             e.printStackTrace();

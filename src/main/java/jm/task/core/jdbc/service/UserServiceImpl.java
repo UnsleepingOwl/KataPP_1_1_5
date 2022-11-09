@@ -11,9 +11,7 @@ public class UserServiceImpl implements UserService {
 //    private UserDaoJDBCImpl userDao = new UserDaoJDBCImpl();
     private UserDaoHibernateImpl userDao = new UserDaoHibernateImpl();
     public UserServiceImpl() {
-
     }
-
 
     // Создание таблицы для User(ов) – не должно приводить к исключению, если такая таблица уже существует
     public void createUsersTable() {

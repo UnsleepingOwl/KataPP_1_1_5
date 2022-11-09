@@ -9,27 +9,26 @@ import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
 
-    private static Util util = Util.getConnectionUtil();
-    Connection connection = util.getConnection();
+    private static final Util CONNECTION_UTIL = Util.getConnectionUtil();
+    private static final Connection CONNECTION = CONNECTION_UTIL.getConnection();
 
     public UserDaoJDBCImpl() {
     }
 
     // Удаление таблицы User(ов) – не должно приводить к исключению, если таблицы не существует
     public void createUsersTable() {
-        try (Statement statement = connection.createStatement()) {
+        try (Statement statement = CONNECTION.createStatement()) {
             try {
                 statement.executeUpdate("CREATE TABLE IF NOT EXISTS USERS (" +
                         "id BIGINT NOT NULL AUTO_INCREMENT," +
                         "name VARCHAR(64)," +
                         "lastName VARCHAR(64)," +
                         "age SMALLINT," +
-                        "PRIMARY KEY ( id ) )"
-                );
-                connection.commit();
+                        "PRIMARY KEY ( id ) )");
+                CONNECTION.commit();
             } catch (SQLException e) {
                 e.printStackTrace();
-                connection.rollback();
+                CONNECTION.rollback();
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -38,57 +37,58 @@ public class UserDaoJDBCImpl implements UserDao {
 
     // Удаление таблицы User(ов) – не должно приводить к исключению, если таблицы не существует
     public void dropUsersTable() {
-        try (Statement statement = connection.createStatement()) {
-            try {
-                statement.executeUpdate("DROP TABLE IF EXISTS users");
-                connection.commit();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                connection.rollback();
-            }
+        try (Statement statement = CONNECTION.createStatement()) {
+            statement.executeUpdate("DROP TABLE IF EXISTS users");
+            CONNECTION.commit();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            try {
+                CONNECTION.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
     // Добавление User в таблицу
     public void saveUser(String name, String lastName, byte age) {
-        try (PreparedStatement prepStat = connection.prepareStatement("INSERT INTO users (name, lastName, age) VALUES(?, ?, ?)")) {
-            try {
-                prepStat.setString(1, name);
-                prepStat.setString(2, lastName);
-                prepStat.setByte(3, age);
-                prepStat.executeUpdate();
-                connection.commit();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                connection.rollback();
-            }
+        try (PreparedStatement prepStat = CONNECTION.prepareStatement("INSERT INTO users (name, lastName, age) VALUES(?, ?, ?)")) {
+            prepStat.setString(1, name);
+            prepStat.setString(2, lastName);
+            prepStat.setByte(3, age);
+            prepStat.executeUpdate();
+            CONNECTION.commit();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            try {
+                CONNECTION.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
     // Удаление User из таблицы ( по id )
     public void removeUserById(long id) {
-        try (PreparedStatement prepStat = connection.prepareStatement("DELETE FROM users where id = ?")) {
-            try {
-                prepStat.setLong(1, id);
-                prepStat.executeUpdate();
-                connection.commit();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                connection.rollback();
-            }
+        try (PreparedStatement prepStat = CONNECTION.prepareStatement("DELETE FROM users where id = ?")) {
+
+            prepStat.setLong(1, id);
+            prepStat.executeUpdate();
+            CONNECTION.commit();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            try {
+                CONNECTION.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
     // Получение всех User(ов) из таблицы
     public List<User> getAllUsers() {
         List<User> userList = new LinkedList<>();
-        try (Statement statement = connection.createStatement();
+        try (Statement statement = CONNECTION.createStatement();
              ResultSet resultSet = statement.executeQuery("SELECT * FROM users")) {
             while (resultSet.next()) {
                 User user = new User();
@@ -98,25 +98,30 @@ public class UserDaoJDBCImpl implements UserDao {
                 user.setAge(resultSet.getByte("age"));
                 userList.add(user);
             }
-            connection.commit();
+            CONNECTION.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+            try {
+                CONNECTION.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
         }
         return userList;
     }
 
     // Очистка содержания таблицы
     public void cleanUsersTable() {
-        try (Statement statement = connection.createStatement()) {
-            try {
-                statement.executeUpdate("TRUNCATE users");
-                connection.commit();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                connection.rollback();
-            }
+        try (Statement statement = CONNECTION.createStatement()) {
+            statement.executeUpdate("TRUNCATE users");
+            CONNECTION.commit();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            try {
+                CONNECTION.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 }
