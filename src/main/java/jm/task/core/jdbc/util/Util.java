@@ -23,19 +23,8 @@ public class Util {
     private static Connection connection;
     private static SessionFactory sessionFactory;
 
-    // Класс-холдер для JDBC
-    private static class ConnectionHolder {
-        public static Util CONNECTION_UTIL =
-                new Util(MY_URL, MY_USER, MY_PASS);
-    }
-
-    // Класс-холдер для Hibernate
-    private static class SessionFactoryHolder {
-        public static Util SESSION_FACTORY_UTIL =
-                new Util(MY_DRIVER, MY_URL, MY_USER, MY_PASS, MY_DIALECT, MY_SHOW_SQL, MY_CURRENT_SESSION_CONTEXT_CLASS);
-    }
-
-    // JDBC, конструктор для CONNECTION_UTIL
+    // JDBC
+    // Конструктор для CONNECTION_UTIL
     private Util(String MY_URL, String MY_USER, String MY_PASS) {
         try {
             connection = DriverManager.getConnection(MY_URL, MY_USER, MY_PASS);
@@ -45,7 +34,25 @@ public class Util {
         }
     }
 
-    // Hibernate, конструктор для SESSION_FACTORY_UTIL
+    // JDBC
+    // Класс-холдер, объект инициализируется при первом вызове метода getConnectionUtil()
+    private static class ConnectionHolder {
+        private final static Util CONNECTION_UTIL = new Util(MY_URL, MY_USER, MY_PASS);
+    }
+
+    public static Util getConnectionUtil() {
+        return ConnectionHolder.CONNECTION_UTIL;
+    }
+
+    // JDBC
+    // Соединение через CONNECTION_UTIL: Util.getConnectionUtil().getConnection()
+    public Connection getConnection() {
+        return connection;
+    }
+
+
+    // Hibernate
+    // Конструктор для SESSION_FACTORY_UTIL
     private Util(String MY_DRIVER, String MY_URL, String MY_USER, String MY_PASS, String MY_DIALECT, String MY_SHOW_SQL, String MY_CURRENT_SESSION_CONTEXT_CLASS) {
         if (sessionFactory == null) {
             try {
@@ -74,20 +81,16 @@ public class Util {
         }
     }
 
-    public static Util getConnectionUtil() {
-        return ConnectionHolder.CONNECTION_UTIL;
+    // Hibernate
+    // Класс-холдер, объект инициализируется при первом вызове метода getSessionFactoryUtil()
+    private static class SessionFactoryHolder {
+        private final static Util SESSION_FACTORY_UTIL =
+                new Util(MY_DRIVER, MY_URL, MY_USER, MY_PASS, MY_DIALECT, MY_SHOW_SQL, MY_CURRENT_SESSION_CONTEXT_CLASS);
     }
 
     public static Util getSessionFactoryUtil() {
         return SessionFactoryHolder.SESSION_FACTORY_UTIL;
     }
-
-    // JDBC
-    // Соединение через CONNECTION_UTIL: Util.getConnectionUtil().getConnection()
-    public Connection getConnection() {
-        return connection;
-    }
-
 
     // Hibernate
     // Соединение через SESSION_FACTORY_UTIL: Util.getSessionFactoryUtil().getSessionFactory()
