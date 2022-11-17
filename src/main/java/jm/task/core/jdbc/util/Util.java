@@ -23,37 +23,23 @@ public class Util {
     private static Connection connection;
     private static SessionFactory sessionFactory;
 
+    private Util() {
+    }
+
     // JDBC
-    // Конструктор для CONNECTION_UTIL
-    private Util(String MY_URL, String MY_USER, String MY_PASS) {
+    public static Connection getConnection() {
         try {
             connection = DriverManager.getConnection(MY_URL, MY_USER, MY_PASS);
             connection.setAutoCommit(false);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    // JDBC
-    // Класс-холдер, объект инициализируется при первом вызове метода getConnectionUtil()
-    private static class ConnectionHolder {
-        private final static Util CONNECTION_UTIL = new Util(MY_URL, MY_USER, MY_PASS);
-    }
-
-    public static Util getConnectionUtil() {
-        return ConnectionHolder.CONNECTION_UTIL;
-    }
-
-    // JDBC
-    // Соединение через CONNECTION_UTIL: Util.getConnectionUtil().getConnection()
-    public Connection getConnection() {
         return connection;
     }
 
 
     // Hibernate
-    // Конструктор для SESSION_FACTORY_UTIL
-    private Util(String MY_DRIVER, String MY_URL, String MY_USER, String MY_PASS, String MY_DIALECT, String MY_SHOW_SQL, String MY_CURRENT_SESSION_CONTEXT_CLASS) {
+    public static SessionFactory getSessionFactory() {
         if (sessionFactory == null) {
             try {
                 Configuration configuration = new Configuration();
@@ -79,22 +65,6 @@ public class Util {
                 e.printStackTrace();
             }
         }
-    }
-
-    // Hibernate
-    // Класс-холдер, объект инициализируется при первом вызове метода getSessionFactoryUtil()
-    private static class SessionFactoryHolder {
-        private final static Util SESSION_FACTORY_UTIL =
-                new Util(MY_DRIVER, MY_URL, MY_USER, MY_PASS, MY_DIALECT, MY_SHOW_SQL, MY_CURRENT_SESSION_CONTEXT_CLASS);
-    }
-
-    public static Util getSessionFactoryUtil() {
-        return SessionFactoryHolder.SESSION_FACTORY_UTIL;
-    }
-
-    // Hibernate
-    // Соединение через SESSION_FACTORY_UTIL: Util.getSessionFactoryUtil().getSessionFactory()
-    public SessionFactory getSessionFactory() {
         return sessionFactory;
     }
 }
