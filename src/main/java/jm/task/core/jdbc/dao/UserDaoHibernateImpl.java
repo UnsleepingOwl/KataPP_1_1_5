@@ -10,7 +10,7 @@ import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
 
-    private SessionFactory sessionFactory = Util.getSessionFactory();
+    private final SessionFactory sessionFactory = Util.getUtilInstance().getSessionFactory();
     private Session session;
     private Transaction transaction;
 
@@ -22,10 +22,10 @@ public class UserDaoHibernateImpl implements UserDao {
         try {
             session = sessionFactory.getCurrentSession();
             transaction = session.beginTransaction();
-            session.createSQLQuery("CREATE TABLE IF NOT EXISTS User"
+            session.createSQLQuery("CREATE TABLE IF NOT EXISTS users"
                             + "(id BIGINT NOT NULL AUTO_INCREMENT,"
                             + "name VARCHAR(64),"
-                            + "lastName VARCHAR(64),"
+                            + "last_name VARCHAR(64),"
                             + "age SMALLINT,"
                             + "PRIMARY KEY ( id ) )")
                     .executeUpdate();
@@ -45,7 +45,7 @@ public class UserDaoHibernateImpl implements UserDao {
         try {
             session = sessionFactory.getCurrentSession();
             transaction = session.beginTransaction();
-            session.createSQLQuery("DROP TABLE IF EXISTS User")
+            session.createSQLQuery("DROP TABLE IF EXISTS users")
                     .executeUpdate();
             transaction.commit();
         } catch (Exception e) {
@@ -94,12 +94,14 @@ public class UserDaoHibernateImpl implements UserDao {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<User> getAllUsers() {
-        List listUsers = null;
+        List<User> listUsers = null;
         try {
             session = sessionFactory.getCurrentSession();
             transaction = session.beginTransaction();
             listUsers = session.createQuery("FROM User").getResultList();
+            transaction.commit();
         } catch (Exception e) {
             e.printStackTrace();
             transaction.rollback();
@@ -108,7 +110,7 @@ public class UserDaoHibernateImpl implements UserDao {
                 session.close();
             }
         }
-        return (List<User>) listUsers;
+        return listUsers;
     }
 
     @Override

@@ -20,13 +20,10 @@ public class Util {
             MY_DIALECT = "org.hibernate.dialect.MySQL8Dialect",
             MY_SHOW_SQL = "true",
             MY_CURRENT_SESSION_CONTEXT_CLASS = "thread";
+
+    /* JDBC */
     private static Connection connection;
-    private static SessionFactory sessionFactory;
 
-    private Util() {
-    }
-
-    // JDBC
     public static Connection getConnection() {
         try {
             connection = DriverManager.getConnection(MY_URL, MY_USER, MY_PASS);
@@ -37,34 +34,44 @@ public class Util {
         return connection;
     }
 
+    /* Hibernate */
+    private SessionFactory sessionFactory;
 
-    // Hibernate
-    public static SessionFactory getSessionFactory() {
-        if (sessionFactory == null) {
-            try {
-                Configuration configuration = new Configuration();
+    // On Demand Holder idiom
+    private static class UtilHolder {
+        static final Util HOLDER_UTIL = new Util();
+    }
 
-                Properties settings = new Properties();
-                settings.put(Environment.DRIVER, MY_DRIVER);
-                settings.put(Environment.URL, MY_URL);
-                settings.put(Environment.USER, MY_USER);
-                settings.put(Environment.PASS, MY_PASS);
-                settings.put(Environment.DIALECT, MY_DIALECT);
-                settings.put(Environment.SHOW_SQL, MY_SHOW_SQL);
-                settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, MY_CURRENT_SESSION_CONTEXT_CLASS);
+    private Util() {
+        try {
+            Properties settings = new Properties();
+            settings.put(Environment.DRIVER, MY_DRIVER);
+            settings.put(Environment.URL, MY_URL);
+            settings.put(Environment.USER, MY_USER);
+            settings.put(Environment.PASS, MY_PASS);
+            settings.put(Environment.DIALECT, MY_DIALECT);
+            settings.put(Environment.SHOW_SQL, MY_SHOW_SQL);
+            settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, MY_CURRENT_SESSION_CONTEXT_CLASS);
 
-                configuration.setProperties(settings);
-                configuration.addAnnotatedClass(User.class);
+            Configuration configuration = new Configuration();
+            configuration.setProperties(settings);
+            configuration.addAnnotatedClass(User.class);
 
-                ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
-                        .applySettings(configuration.getProperties())
-                        .build();
+            ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
+                    .applySettings(configuration.getProperties())
+                    .build();
 
-                sessionFactory = configuration.buildSessionFactory(serviceRegistry);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    public static Util getUtilInstance() {
+        return UtilHolder.HOLDER_UTIL;
+    }
+
+    public SessionFactory getSessionFactory() {
         return sessionFactory;
     }
 }
