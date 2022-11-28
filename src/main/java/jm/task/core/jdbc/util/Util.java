@@ -18,7 +18,7 @@ public class Util {
             MY_PASS = "root",
             MY_DRIVER = "com.mysql.cj.jdbc.Driver",
             MY_DIALECT = "org.hibernate.dialect.MySQL8Dialect",
-            MY_SHOW_SQL = "true",
+            MY_SHOW_SQL = "false",
             MY_CURRENT_SESSION_CONTEXT_CLASS = "thread";
 
     /* JDBC */
@@ -39,7 +39,7 @@ public class Util {
 
     // On Demand Holder idiom
     private static class UtilHolder {
-        static final Util HOLDER_UTIL = new Util();
+        static final Util LAZY_UTIL_INSTANCE = new Util();
     }
 
     private Util() {
@@ -65,14 +65,30 @@ public class Util {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("\n|Util| Создание экземпляра Util - LAZY_UTIL_INSTANCE\n");
     }
 
     public static Util getUtilInstance() {
-        return UtilHolder.HOLDER_UTIL;
+        return UtilHolder.LAZY_UTIL_INSTANCE;
     }
 
     public SessionFactory getSessionFactory() {
         return sessionFactory;
     }
 }
+
+/*
+
+    private static Util lazyUtilInstance;
+
+    public static Util getUtilInstance() {
+        if(lazyUtilInstance == null){
+            synchronized(Util.class){
+                if(lazyUtilInstance == null)
+                    lazyUtilInstance = new Util();
+            }
+        }
+        return lazyUtilInstance;
+    }
+ */
 
