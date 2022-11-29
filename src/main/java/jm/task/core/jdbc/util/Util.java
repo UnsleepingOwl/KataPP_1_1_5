@@ -35,12 +35,8 @@ public class Util {
     }
 
     /* Hibernate */
+    private static Util lazyUtilInstance;
     private SessionFactory sessionFactory;
-
-    // On Demand Holder idiom
-    private static class UtilHolder {
-        static final Util LAZY_UTIL_INSTANCE = new Util();
-    }
 
     private Util() {
         try {
@@ -65,30 +61,18 @@ public class Util {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("\n|Util| Создание экземпляра Util - LAZY_UTIL_INSTANCE\n");
+        System.out.println("\n|Util| Создание экземпляра Util - lazyUtilInstance\n");
     }
 
     public static Util getUtilInstance() {
-        return UtilHolder.LAZY_UTIL_INSTANCE;
+        if (lazyUtilInstance == null) {
+            lazyUtilInstance = new Util();
+        }
+        return lazyUtilInstance;
     }
 
     public SessionFactory getSessionFactory() {
         return sessionFactory;
     }
 }
-
-/*
-
-    private static Util lazyUtilInstance;
-
-    public static Util getUtilInstance() {
-        if(lazyUtilInstance == null){
-            synchronized(Util.class){
-                if(lazyUtilInstance == null)
-                    lazyUtilInstance = new Util();
-            }
-        }
-        return lazyUtilInstance;
-    }
- */
 
